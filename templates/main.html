@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block meta %}
+<meta name="w1-verification" content="141185130573" />
+{% endblock meta %}
+{% block body %}
+	{{ super() }}
+    <div class="header full-width">
+        <div class="row">
+			{#
+            <div class="row">
+                <div class="header__title large-6 large-offset-3 columns">
+                    <a href="#" class="header__logo"><img src="/static/assets/img/logo_outlined.png"></a>
+                </div>
+            </div>#}
+            <div class="row">
+                <div class="header__description large-8 large-offset-2 columns">
+                    <h4>{{ settings.slogan|safe }}</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="header__buttons large-10 large-offset-1 columns">
+                    <div class="large-4 large-offset-0 columns">
+                    	{% if current_user.is_authenticated() %}
+                    		{% if current_user.doer %}
+                        		<a href="{{ url_for('frontend.task_list') }}" class="header__bigbtn large radius button">Найти работу</a>
+                        	{% else %}
+                        		<a href="{{ url_for('frontend.request_doer_rights') }}" class="header__bigbtn large radius button">Найти работу</a>
+                        	{% endif %}
+
+                    	{% else %}
+                    	<a href="{{ url_for('frontend.reg') }}" class="header__bigbtn large radius button">Найти работу</a>
+                    	{% endif %}
+                    </div>
+                    <div class="large-4 large-offset-2 columns">
+                    	{% if current_user.is_authenticated() %}
+                        <a href="{{ url_for('frontend.task_new') }}" class="header__bigbtn large radius button">Заказать услугу</a>
+                    	{% else %}
+                    	<a href="{{ url_for('frontend.reg') }}" class="header__bigbtn large radius button">Заказать услугу</a>
+                    	{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>		
+    </div>
+	
+<div class="panel">
+	<h3 class="panel__heading">Популярные услуги</h3>
+	
+	<div class="row">
+		<div class="large-3 medium-3 columns">
+			<strong><a href="{{ url_for('frontend.task_list', category_name='remont-i-otdelka') }}">Ремонт и отделка</strong>
+				<br />
+				<ul>
+					<li><a href="{{ url_for('frontend.task_list', category_name='elektroprovodka-rozetki') }}">Электропроводка, розетки</a></li>
+					<li><a href="{{ url_for('frontend.task_list', category_name='pokleyka-oboev') }}">Поклейка обоев</a></li>
+					<li><a href="{{ url_for('frontend.task_list', category_name='master-na-chas') }}">Мастер на час</a></li>
+				</ul>
+				</p>
+		</div>
+		<div class="large-3 medium-3 columns">
+			<strong><a href="{{ url_for('frontend.task_list', category_name='kurerskie-uslugi') }}">Курьерские услуги</strong>
+				<br /><ul>
+					<li><a href="{{ url_for('frontend.task_list', category_name='uslugi-peshego-kurera') }}">Услуги пешего курьера</a></li>
+					<li><a href="{{ url_for('frontend.task_list', category_name='uslugi-kurera-na-avto') }}">Услуги курьера на авто</a></li>
+					<li><a href="{{ url_for('frontend.task_list', category_name='dostavka-produktov') }}">Доставка продуктов</a></li>
+				</ul></p>
+		</div>
+		<div class="large-3 medium-3 columns">
+			<strong><a href="{{ url_for('frontend.task_list', category_name='foto-i-video-uslugi') }}">Фото и видео</strong>
+				<br /><ul>
+					<li><a href="{{ url_for('frontend.task_list', category_name='fotosemka') }}">Фотосъёмка</a></li>
+					<li><a href="{{ url_for('frontend.task_list', category_name='videosemka') }}">Видеосъёмка</a></li>
+					<li><a href="{{ url_for('frontend.task_list', category_name='sozdanie-videorolikov') }}">Создание видеороликов</a></li>
+				</ul></p>
+		</div>
+		<div class="large-3 medium-3 columns">
+			<strong><a href="{{ url_for('frontend.task_list', category_name='tehnika-v-dome') }}">Техника в доме</strong>
+				<br /><ul>
+					<li><a href="{{ url_for('frontend.task_list', category_name='ustanovka-bitovoy-tehniki') }}">Установка бытовой техники</a></li>
+					<li><a href="{{ url_for('frontend.task_list', category_name='remont-bitovoy-tehniki') }}">Ремонт техники</a></li>
+					<li><a href="{{ url_for('frontend.task_list', category_name='remont-chasov') }}">Ремонт часов</a></li>
+				</ul></p>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="center-x">
+			<a href="{{ url_for('frontend.user_list') }}" class="large radius button">Все услуги</a>
+		</div>
+	</div>
+</div>
+
+{% endblock body %}

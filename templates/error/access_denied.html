@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block controller %}info{% endblock %}
+{% block body %}
+	{{ super() }}
+	<div class="info-page page-narrower">
+		<h1>Ошибка</h1>
+		<p>У вас нет прав на совершение этого действия.</p>
+		<p>Если вы уверены, что у вас должен быть доступ к этому действию, обратитесь к администрации.</p>
+	</div>
+
+{% endblock body %}

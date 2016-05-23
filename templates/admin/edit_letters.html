@@ -1,0 +1,21 @@
+{% extends 'admin/admin_base.html' %}
+{% block controller %}admin_info{% endblock %}
+{% block admin_page %}
+	{{ super() }}
+    <h1>Редактирование писем</h1>
+
+    <div class="admin-info__items">
+        {% for letter in letters %}
+            <div class="letter-item row">
+                <div class="letter-item__title small-7 columns">
+                    <a href="{{  url_for('frontend.admin_edit_letter', name=letter.name)  }}">{{ letter.human_name or letter.name }}</a>
+                </div>
+                <div class="letter-item__actions small-5 columns">
+                    <a class="button mini" href="{{ url_for('frontend.admin_edit_letter', name=letter.name) }}">Изменить</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+        
+
+{% endblock admin_page %}

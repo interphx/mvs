@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block controller %}payment_new{% endblock %}
+{% block body %}
+	{{ super() }}
+	<div class="page-narrower">
+		<div class="center-x">
+		    <h2>Пополнение счёта</h2>
+		</div>
+		<form class="payment-form" action="https://wl.walletone.com/checkout/checkout/Index" accept-charset="UTF-8" method="POST">
+		    <input name="WMI_MERCHANT_ID" value="141185130573" type="hidden" /> <!-- TODO read from config -->
+	
+
+		    	<label>На какую сумму вы хотите пополнить свой счёт?</label>
+		    	<div>
+			    	<input name="WMI_PAYMENT_AMOUNT" class="payment-form__amount" type="text" value="500.00" />
+			    	<span>руб.</span>
+		    	</div>
+	
+		    <input name="WMI_PAYMENT_NO" value="{{ payment_id }}" type="hidden" /> <!-- TODO if needed -->
+		    <input name="WMI_CURRENCY_ID" value="643" type="hidden" />
+		    <input name="WMI_DESCRIPTION" value="Пополнение счёта пользователя ({{ current_user.full_name }})" type="hidden" />
+		    <input name="WMI_SUCCESS_URL" value="{{ url_for('frontend.payment_success', _external=True) }}" type="hidden" /> <!-- TODO add reference to payment and amount? -->
+		    <input name="WMI_FAIL_URL" value="{{ url_for('frontend.payment_fail', _external=True) }}" type="hidden" /> <!-- TODO add reference to payment and amount? -->
+		    <input name="WMI_CUSTOMER_PHONE" value="{{ current_user.phone }}" type="hidden" /> <!-- TODO международный формат -->
+		    <input name="WMI_CUSTOMER_EMAIL" value="{{ current_user.email }}" type="hidden" />
+		    <input name="WMI_CULTURE_ID" value="ru-RU" type="hidden" />
+		    <input class="button" type="submit" value="Оплатить" />
+		</form>
+	</div>
+{% endblock body %}

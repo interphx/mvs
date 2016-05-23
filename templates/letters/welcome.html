@@ -1,0 +1,14 @@
+{% extends 'letters/base.html' %}
+
+{% block body %}
+Добро пожаловать на {{ config.website.name }}!
+
+Данные для входа на сайт:
+E-mail: {{ user_email }}
+Пароль: {{ plain_password }}
+
+Не теряйте их и не давайте посторонним лицам!
+movesol.ru
+
+Желаем приятной работы с {{ config.website.name }}!
+{% endblock %}

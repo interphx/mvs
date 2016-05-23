@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block controller %}info{% endblock %}
+{% block body %}
+	{{ super() }}
+	<div class="info-page page-narrower">
+		<h1>Информация</h1>
+		<p>В этом разделе вы найдёте руководство по использованию сайта, часто задаваемые вопросы и многое другое.</p>
+        {% for page in pages %}
+            <div class="info-page__item">
+                <a href="{{ url_for('frontend.info_page', url_name=page.url_name) | replace('%25', '%') }}">{{ page.title }}</a>
+            </div>
+        {% endfor %}
+	</div>
+
+{% endblock body %}

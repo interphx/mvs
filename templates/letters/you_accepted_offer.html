@@ -1,0 +1,11 @@
+{% extends 'letters/base.html' %}
+
+{% block body %}
+Вы выбрали исполнителя для задания "{{ task.title }}". Исполнителя зовут {{ doer.full_name }}.
+Ссылка на задание: {{ url_for('frontend.task', id=task.id, _external=True) }}
+
+Контакты исполнителя
+Телефон: {{ doer.phone }}
+E-mail: {{ doer.email }}
+
+{% endblock %}

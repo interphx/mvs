@@ -1,0 +1,40 @@
+{% extends 'admin/admin_base.html' %}
+{% block controller %}admin_applications{% endblock %}
+{% block admin_page %}
+	{{ super() }}
+	<h1>Заявки на права исполнителей</h1>
+    <div class="admin-applications">
+    	<table class="admin-applications__list">
+    	<tr>
+    		<th>id</th>
+    		<th>Полное имя</th>
+    		<th>Телефон</th>
+    		<th>E-mail</th>
+            <th>Паспорт</th>
+    		<th>Действия</th>
+    	</tr>
+    	{% for application in applications %}
+    		<tr class="admin-applications__item">
+    			<td class="admin-applications__id">{{ application.id }}</td>
+    			<td class="admin-applications__name"><a href="{{ url_for('frontend.user_view', id=application.user.id) }}">{{ application.user.full_name }}</a></td>
+    			<td class="admin-applications__phone">{{ application.user.phone }}</td>
+                <td class="admin-applications__email">{{ application.user.email }}</td>
+    			<td class="admin-applications__passport"><a href="{{ application.passport_scan.url }}" target="_blank">Посмотреть</a></td>
+    			<td class="admin-applications__actions">
+    				<form class="single-action-form" action="{{ url_for('frontend.confirm_doer_application') }}" method="POST">
+    					<input type="hidden" name="application_id" value="{{ application.id }}">
+    					<input type="submit" class="button mini" value="Принять">
+    				</form>
+    				<form class="single-action-form" action="{{ url_for('frontend.reject_doer_application') }}" method="POST">
+    					<input type="hidden" name="application_id" value="{{ application.id }}">
+    					<input type="submit" class="button mini" value="Отклонить">
+    				</form>
+    			</td>
+    		</tr>
+    	{% endfor %}
+    	</table>
+    </div>
+    {% if applications|length == 0 %}
+    <p>Заявок на права исполнителя пока нет.</p>
+    {% endif %}
+{% endblock admin_page %}

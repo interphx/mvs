@@ -1,0 +1,52 @@
+{% extends 'admin/admin_base.html' %}
+{% block controller %}admin_settings{% endblock %}
+{% block admin_page %}
+	{{ super() }}
+    <h1>Настройки сайта</h1>
+
+    <form class="settings-form" method="POST">
+        <ul class="form-errors settings-form__errors">
+          {% for field_name in settingsForm.errors %}
+            {% for error in settingsForm.errors[field_name] %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+
+        <div class="row callout panel">
+            <label for="slogan">Слоган</label>
+            <input type="text" class="admin-settings__slogan" name="slogan" id="slogan" value="{{ settings.slogan }}">
+        </div>
+
+        <div class="row callout panel">
+            <label for="seo_keywords">Ключевые слова (meta keywords)</label>
+            <input type="text" class="admin-settings__seo-keywords" name="seo_keywords" id="slogan" value="{{ settings.seo_keywords }}">
+        </div>
+
+        <div class="row callout panel">
+            <label for="seo_description">Описание (meta description)</label>
+            <input type="text" class="admin-settings__seo-description" name="seo_description" id="slogan" value="{{ settings.seo_description }}">
+        </div>
+
+        <div class="row callout panel">
+            <label for="commission">Комиссия</label>
+            <textarea class="admin-settings__commission" name="commission_ranges" id="commission_ranges">{{ commission_ranges_text }}</textarea>
+            <div class="instruction">
+            <p>Все диапазоны цен нужно указывать через дефис, а комиссию через знак равно. Каждый диапазон с новой строчки.<br>
+            Диапазон "X и более" указывается как "X+ = КОМИССИЯ"
+            Например:</p>
+            <p> 1 - 15000 = 13%<br>
+                15001 - 30000 = 9%<br>
+                30001 - 45000 = 7%<br>
+                45001+ = 5%<br>
+            </p>
+            <p>Также вы можете использовать запись "0.13" вместо "13%"</p>
+            </div>
+        </div>
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="submit" class="button" name="submit_settings" value="Обновить настройки" />
+    </form>
+
+
+{% endblock admin_page %}

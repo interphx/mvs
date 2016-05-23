@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block controller %}mobile_confirmation{% endblock %}
+{% block body %}
+	{{ super() }}
+	<div class="page-narrower">
+		<div class="center-x">
+		    <h2>Подтверждение мобильного</h2>
+		</div>
+		<p>Чтобы подтвердить свой телефон, запросите код подтверждения. На ваш номер будет отправлено SMS с кодом, который нужно ввести в текстовое поле ниже.</p>
+		{% if cooldown == 0 %}
+		<form method="POST" action="{{ url_for('frontend.send_mobile_confirmation_sms') }}">
+			<input class="button" type="submit" value="Запросить код подтверждения" />
+		</form>
+		{% else %}
+		<p>Вам выслан код подтверждения. Вы сможете повторно запросить код через {{ cooldown|int }} секунд.</p>
+		{% endif %}
+		<ul class="form-errors">
+		  {% for field_name in confirmationForm.errors %}
+			{% for error in confirmationForm.errors[field_name] %}
+			  <li>{{ error }}</li>
+			{% endfor %}
+		  {% endfor %}
+		</ul>
+		<form class="mobile-confirmation-form" method="POST">
+
+	    	<label>Если вы уже запросили код, введите его сюда:</label>
+
+	    	<input name="{{ confirmationForm.code.name }}" class="mobile-confirmation-form__code" type="text" value="" />
+	
+		    <input class="button" type="submit" value="Подтвердить" />
+		</form>
+	</div>
+{% endblock body %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block controller %}info_new{% endblock %}
+{% block body %}
+	{{ super() }}
+	<div class="new-info-page page-narrower">
+		<h1>Создание страницы</h1>
+		<form class="info-page-form" method="POST">
+			<ul class="form-errors settings-form__errors">
+			  {% for field_name in infoPageForm.errors %}
+				{% for error in infoPageForm.errors[field_name] %}
+				  <li>{{ error }}</li>
+				{% endfor %}
+			  {% endfor %}
+			</ul>
+
+			<div class="row callout panel">
+				<label for="title">Заголовок</label>
+				<input type="text" class="new-info-page__title" name="title" id="title" value="">
+			</div>
+
+			<div class="row callout panel">
+				<label for="text">Текст</label>
+                <textarea class="new-info-page__text wysiwyg" name="text" id="text"></textarea>
+			</div>
+
+			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+			<input type="submit" class="button" name="submit" value="Создать страницу" />
+		</form>
+	</div>
+
+{% endblock body %}

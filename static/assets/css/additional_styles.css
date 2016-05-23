@@ -1,0 +1,110 @@
+.admin-sidebar {
+    max-width: 290px;
+    float: left;
+    margin-right: 1em;
+}
+
+.admin__menu {
+    list-style: none;
+}
+
+.admin-page-content {
+    text-align: center;
+    float: right;
+}
+
+.page-item {
+    border-bottom: #AAA;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+.page-item:hover {
+    background: #FFFC8E;
+}
+
+.page-item__title {
+    text-align: left;
+}
+
+.page-item__title a {
+    display: block;
+}
+
+.page-item__actions {
+    text-align: right;
+}
+
+.page-item__actions .button {
+    margin-bottom: 0;
+    font-size: 0.9em;
+    padding: 0.5em;
+}
+
+.payment-form {
+    text-align: center;
+}
+.payment-form > input {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.payment-form__amount {
+    width: 20% !important;
+    display: inline-block !important;
+    text-align: right;
+    font-size: 1.2em !important;
+}
+
+.button.mini {
+    font-size: 0.9em;
+    padding: 0.5em;
+    margin-bottom: 0
+}
+
+.single-action-form {
+    display: inline-block;
+}
+
+.admin-page-content {
+    padding: 0;
+}
+
+.admin-applications__actions {
+    padding: 0.1em;
+}
+
+.admin-settings__commission {
+    min-height: 100px;
+}
+
+.instruction {
+    text-align: left;
+}
+
+.edit-letter__text {
+    min-height: 300px;
+}
+
+.letter-item {
+    height: 2em;
+}
+
+.letter-item__title {
+    text-align: left;
+}
+
+.sticky-header a {
+    font-size: 1.1em;
+}
+
+.portfolio__item {
+	display: inline-block;
+	width: 130px;
+	height: 130px;
+}
+
+.wrapper-link {
+	margin: 0;
+	padding: 0;
+}

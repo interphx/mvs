@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% block controller %}task_view{% endblock %}
+{% block js_globals %}
+	{{ super() }}
+	<script>
+		GLOBAL.task = {
+			id: {{ task.id }},
+			title: '{{ task.title|oneline }}',
+			description: '{{ task.description|nl2br }}',
+			created_at: '{{ task.created_at }}',
+			reward: {{ task.reward or 'null' }},
+			{% if task.doer %}
+			doer: {
+				id: {{ task.doer.id }},
+				full_name: '{{ task.doer.full_name|oneline }}'
+			},
+			{% endif %}
+			customer: {
+				id: {{ task.customer.id }},
+				full_name: '{{ task.customer.full_name|oneline }}'
+			}
+		}
+	</script>
+{% endblock %}
+{% block body %}
+	{{ super() }}
+	{% set is_owner = current_user.is_authenticated() and current_user.id == task.customer.id %}
+	<div class="task-page page-narrower">
+
+		<div class="task-single">
+			<div class="task-single__category">
+				{% if task.category.isSubCategory %}
+				<a class="task-category-breadcumb" href="{{ url_for('frontend.task_list', category_name=task.category.parent.url_name) }}">{{ task.category.parent.name }}</a> &gt;
+				<a class="task-category-breadcumb" href="{{ url_for('frontend.task_list', category_name=task.category.url_name) }}">{{ task.category.name }}</a>
+				{% else %}
+				<a class="task-category-breadcumb" href="{{ url_for('frontend.task_list', category_name=task.category.url_name) }}">{{ task.category.name }}</a>
+				{% endif %}
+			</div>
+
+			<div class="row">
+				<div class="large-8 columns task-single__title-part"><h1>{{ task.title }}</h1></div>
+				<div class="large-4 columns task-single__title-part"><div class="task-single__reward">{{ '%d руб.' % task.reward if task.reward else 'Цена договорная' }}</div></div>
+			</div>
+
+			<div class="row task-single__meta">
+				<div class="large-8 columns"><div class="task-single__status">{{ task.status | task_status_text }}</div></div>
+				<div class="large-4 columns"><div class="task-single__created-at">{{ 'Создано ' + (task.created_at|to_right_timezone|datetime_pretty) }}</div></div>
+			</div>
+
+			<div class="row">
+				<div class="large-12 columns"><div class="task-single__due">Нужно сделать до {{ task.due.strftime('%d.%m.%Y, %H:%M') }}</div></div>
+			</div>
+
+			{% if task.addresses|length > 0 %}
+			<div class="row">
+				<div class="large-12 columns">
+					<h3>{{ 'Адреса' if task.addresses|length > 1 else 'Адрес' }}</h3>
+					<ul class="task-single__addresses">
+					{% for address in task.addresses %}
+						<li class="task-single__address">{{ address }}</li>
+					{% endfor %}
+					</ul>
+				</div>
+			</div>
+			{% endif %}
+
+			<div class="row">
+				<div class="large-12 columns">
+					<h3>Описание</h3>
+					<div class="task-single__description">
+					{{ task.description }}
+					</div>
+				</div>
+			</div>
+
+			{% if is_owner %}
+			<div class="row">
+				<div class="large-12 columns">
+					<h3>Действия</h3>
+					<div class="large-12 columns">
+						<div class="task-single__actions panel">
+							<div class="task__action action action--dangerous"><a class="js-action js-action-remove-task" data-id="{{ task.id }}">Удалить задание</a></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+
+			
+			<h3>{{ 'Задание уже выполняется' if task.status == 'assigned' else 'Задание выполнено' if task.status == 'completed' else 'Предолжения исполнителей'}}</h3>
+			{% if task.doer %}
+				{% if is_owner %}
+					{% if task.status == 'assigned' %}
+						<a class="button js-action-confirm-execution">Нажмите сюда, когда задание будет выполнено</a>
+					{% endif %}
+				{% endif %}
+
+				{% if task.doer.id == current_user.id and task.confirmations.filter_by(sender_id=current_user.id).count() == 0 %}
+					<p>Вы &mdash; исполнитель этого задания!</p>
+					{% if task.status == 'assigned' %}
+						<a class="button js-action-confirm-execution">Нажмите сюда, если уже выполнили задание</a>
+					{% endif %}
+				{% else %}
+					<p>Исполнитель уже выбран. Задание выполняет <a href="{{ url_for('frontend.user_view', id=task.doer.id) }}">{{ task.doer.full_name }}</a></p>
+				{% endif %}
+			{% else %}
+
+				{% set offers_count = task.offers.count() %}
+
+				<p>У задания {{ 'пока нет предложений' if offers_count == 0 else offers_count ~ offers_count|plural_form([' предложение', ' предложения', ' предложений']) }}.</p>
+
+				{% if current_user.is_authenticated and not is_owner %}
+					{% if current_user.doer %}
+						{% set own_offer = task.offers.filter_by(doer_id=current_user.id).first() %}
+
+						{% if own_offer %}
+							<p>Вы уже отправили предложение о выполнении этого задания. <a class="action action-dangerous js-action-remove-own-offer" data-id="{{ own_offer.id }}">Отменить предложение</a></p>
+						{% else %}
+							{% if task.reward %}
+								<p>Комиссия: {{ task.reward|commission }} руб.</p>
+								<p>Ваша прибыль: {{ task.reward|int - task.reward|commission }} руб.</p>
+							{% endif %}
+							{% if task.reward and task.reward|commission > current_user.balance %}
+								<p>У вас недостаточно средств на счёте для снятия комиссии, поэтому вы не можете предложить заказчику выполнение этого задания. Пожалуйста, пополните счёт как минимум на {{ task.reward|commission - current_user.balance|int }} руб. или выберите другое, более дешёвое задание.</p>
+							{% else %}
+								<a class="button js-button-add-offer">Могу сделать</a>
+							{% endif %}
+						{% endif %}
+						
+					{% else %}
+						<p>Чтобы предлагать свои услуги, вам нужно стать исполнителем</p>
+						<a class="button" href="{{ url_for('frontend.request_doer_rights') }}">Стать исполнителем</a>
+					{% endif %}
+				{% endif %}
+
+				{% if is_owner %}
+				<div class="task-page__offers">
+
+					{% if offers.count() == 0 %}
+					<p>Предложений пока нет</p>
+					{% endif %}
+
+					{% for offer in offers %}
+					<div class="task-page__offer row">
+						<div class="offer__author large-2 columns">
+							<img {#TODO#} src="/static/assets/img/no_avatar.png" class="user-avatar offer__avatar">
+							<p class="offer__full-name">{{offer.doer.full_name}}</p>
+						</div>
+						<div class="offer__content large-8 columns">
+							<h4>{{ offer.price }} руб.</h4>
+							<p class="offer__text">{{offer.text}}</p>
+						</div>
+						<div class="offer__actions large-2 columns">
+							<a class="button js-action-accept-offer" data-offer-id="{{ offer.id }}">Принять</a>
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+				{% else %}				
+					<p>Предложения видит только заказчик.</p>
+				{% endif %}
+
+			{% endif %}
+
+			
+			<h3>Комментарии</h3>
+
+			{% if current_user.is_authenticated %}
+			<a class="button js-button-add-comment">Написать комментарий</a>
+			{% endif %}
+
+			<div class="task-page__comments">
+				{% if comments.count() == 0 %}
+				<p>Комментариев пока нет</p>
+				{% endif %}
+				{% for comment in comments %}
+				<div class="task-page__comment comment row">
+					<div class="comment__author large-2 columns">
+						<img {#TODO#} src="/static/assets/img/no_avatar.png" class="user-avatar comment__avatar">
+						<p class="comment__full-name">{{comment.author.full_name}}</p>
+					</div>
+					<div class="comment__content large-10 columns">
+						<p class="comment__text">{{comment.text}}</p>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+
+		</div>
+
+	</div>
+{% endblock body %}

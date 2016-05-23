@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block controller %}request_doer_rights{% endblock %}
+{% block js_globals %}
+{{ super() }}
+<script>
+if( GLOBAL.hasOwnProperty('current_user') ) {
+    GLOBAL.all_categories = [];
+    {% for category in all_categories_hierarchy %}
+        var children = [];
+        {% for child in all_categories_hierarchy[category].children %}
+            children.push({'name': '{{ child.name }}', 'id': {{ child.id }}, 'done_by_this_user': {{ child.done_by_this_user|lower }} });
+        {% endfor %}
+        GLOBAL.all_categories.push({'name': '{{ all_categories_hierarchy[category].data.name }}', 'children': children});
+    {% endfor %}
+}
+</script>
+{% endblock js_globals %}
+{% block body %}
+	{{ super() }}
+	<div class="page-narrower">
+		<div class="center-x">
+		    <h2>Получение прав исполнителя</h2>
+		</div>
+		{% if application_exists %}
+			<p>Ваша заявка успешно отправлена. Мы сообщим вам, когда администрация её рассмотрит.</p>
+		{% else %}
+			{% if not current_user.phone_confirmed %}
+				<p>Чтобы отправить заявку на получение права выполнять задания, вам нужно <a href="{{ url_for('frontend.confirm_mobile') }}">подтвердить телефон</a>.</p>
+				<a href="{{ url_for('frontend.confirm_mobile') }}">Подтвердить телефон и стать исполнителем</a>
+			{% endif %}
+            {% if not current_user.avatar %}
+				<p>Вы должны <a href="{{ url_for('frontend.change_avatar') }}">загрузить фото</a>, чтобы отправить заявку и получить возможность выполнять задания.</p>
+				<a href="{{ url_for('frontend.change_avatar') }}">Добавить фото</a>
+			{% endif %}
+        
+			{% if current_user.phone_confirmed and current_user.avatar %}
+                <h2>Правила</h2>
+				<p>Выполнять задания на Movesol могут только пользователи, которые прошли процедуру верификации. Для этого не требуется приезжать в офис, весь процесс проходит онлайн абсолютно бесплатно и занимает 10–15 минут.</p>
+
+                <p>Для прохождения процедуры верификации необходимо указать ваши персональные данные и заполнить ваш личный профиль на Movesol.</p>
+				<ul class="form-errors">
+				  {% for field_name in applicationForm.errors %}
+					{% for error in applicationForm.errors[field_name] %}
+					  <li>{{ error }}</li>
+					{% endfor %}
+				  {% endfor %}
+				</ul>
+
+                <p>Пожалуйста, добавьте добавьте одно или два доверенных лица, которые могут поручиться за вас:</p>
+				<table class="trusted-persons" style="{{ '' if current_user.trusted_persons.count() > 0 else 'display: none' }}">
+                    <tr>
+                        <th>ФИО</th>
+                        <th>Телефон</th>
+                        <th>Комментарий</th>
+                        <th>Действия</th>
+                    </tr>
+                    {% for person in current_user.trusted_persons %}
+                        <tr>
+                            <td>{{ person.full_name }}</td>
+                            <td>{{ person.phone }}</td>
+                            <td>{{ person.description }}</td>
+                            <td>
+                                <a class="button tiny js-button-delete-trusted" data-id="{{ person.id }}">Удалить</a>
+                            </td>
+                        </tr>
+                    {% endfor %}                    
+                </table>
+                <a class="button js-action-add-trusted">Добавить доверенное лицо</a>
+                
+                <h2>Выберите категории, которые вам интересны</h2>
+                <p>Выберите 1-3 категорий заданий, которые вас интересуют. После получения прав исполнителя вы сможете добавить больше категорий в своём профиле.</p>
+                <ul class="task-categories">
+                    {% for category in current_user.task_categories %}
+                        <li>{{ category.name }}</li>
+                    {% endfor %}
+                </ul>
+                <a class="button js-action-edit-task-cats">{% if current_user.task_categories|length == 0 %}Добавить категории{% else %}Изменить категории{% endif %}</a>
+                
+				<form method="POST" enctype="multipart/form-data">
+					<div class="row checkbox">
+						<input type="checkbox" name="truthy_info" id="truthy_info">
+						<label for="truthy_info">{{ applicationForm.truthy_info.label.text }}</label>
+					</div>
+					<div class="row checkbox">
+						<input type="checkbox" name="first_time" id="first_time">
+						<label for="first_time">{{ applicationForm.first_time.label.text }}</label>
+					</div>
+					<div class="row checkbox">
+						<input type="checkbox" name="handling_okay" id="handling_okay">
+						<label for="handling_okay">{{ applicationForm.handling_okay.label.text }}</label>
+					</div>
+					<div class="row">
+						<label>Скан паспорта:</label>
+						<input type="file" name="passport_scan">
+					</div>
+					<input type="submit" class="button" value="Отправить заявку" >
+				</form>
+			{% endif %}
+		{% endif %}
+		<p><a href="{{ url_for('frontend.user_view', id=current_user.id) }}">Вернуться в профиль</a></p>
+		<p><a href="{{ url_for('frontend.index') }}">На главную страницу</a></p>
+	</div>
+{% endblock body %}

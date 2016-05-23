@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<div class="login-page page-narrower">
+	<h2>Войдите на сайт</h2>
+	<article class="login-form">
+    <ul class="form-errors">
+      {% for field_name in login_form.errors %}
+        {% for error in login_form.errors[field_name] %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+	<form method="POST">
+
+	  <div class="row">
+		<div class="large-12 columns">
+		  <label>E-mail
+			<!-- <input type="text" name="email" placeholder="large-12.columns" /> -->
+			{{ login_form.email() }}
+		  </label>
+		</div>
+	  </div>
+	  
+	  <div class="row">
+		<div class="large-12 columns">
+		  <label>Пароль
+			<!-- <input type="text" name="phone" placeholder="large-12.columns" /> -->
+			{{ login_form.password() }}
+		  </label>
+		</div>
+	  </div>
+	  
+	  <div class="row">
+		<div class="large-12 columns">
+		  <label>Запомнить меня
+			<!-- <input type="text" name="phone" placeholder="large-12.columns" /> -->
+			{{ login_form.remember_me() }}
+		  </label>
+		</div>
+	  </div>
+	  
+	  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+	  <input type="submit" class="button" value="Войти" />
+	</form>
+	</article>
+	<a href="{{ url_for('frontend.restore_password') }}">Забыли пароль?</a>
+</div>
+{% endblock %}

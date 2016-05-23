@@ -1,0 +1,11 @@
+{
+	"app": {
+		"debug": true
+	},
+	
+	"flask": {
+		"SERVER_NAME": "localhost",
+		"HOST": "localhost",
+        "PORT": 80
+	}
+}

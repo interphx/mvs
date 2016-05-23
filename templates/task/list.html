@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block body %}
+	{{ super() }}
+	<div class="tasks-catalogue row">
+
+		<section class="tasks-catalogue__sidebar sidebar panel large-4 columns">
+			<ul class="tasks-catalogue__menu">
+				{% for category in categories %}
+					{% if not category.isSubCategory %}
+						{% set is_cat_selected = selected_category.id == category.id or (selected_category.parent and selected_category.parent.id == category.id) %}
+						
+						<li class="tasks-catalogue__menu-item"><a class="tasks-catalogue__menu-link {{ 'tasks-catalogue__menu-item--selected' if category.id == selected_category.id }}" href="{{ url_for('frontend.task_list', category_name=category.url_name) }}">{{ category.name }}</a></li>
+						{% if (not category.isSuperCategory) and is_cat_selected %}
+						<ul class="task-catalogue__submenu">
+							{% for subcategory in category.children %}
+							{% set is_subcat_selected = selected_category.id == subcategory.id %}
+							<li class="tasks-catalogue__menu-item"><a class="tasks-catalogue__menu-link {{ 'tasks-catalogue__menu-item--selected' if subcategory.id == selected_category.id }}" href="{{ url_for('frontend.task_list', category_name=subcategory.url_name) }}">{{ subcategory.name }}</a></li>
+							{% endfor %}
+						</ul>
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+			</ul>
+		</section>
+
+		<section class="tasks-catalogue__list large-8 columns">
+		<div class="center-x row">
+			<h2>{{ selected_category.name }}</h2>
+		</div>
+		{% if tasks|length == 0 %}
+			<p>В этой категории пока нет заданий.</p>
+			{% if current_user.is_authenticated() %}
+				<p>Хотите заказать услугу? Просто <a href="{{ url_for('frontend.task_new') }}">создайте задание</a> и ожидайте предложений от исполнителей.</p>
+			{% else %}
+				<p>Хотите заказать услугу? <a href="{{ url_for('frontend.reg') }}">Зарегистрируйтесь</a> и создайте задание. Исполнители сами предложат вам свои услуги.</p>
+			{% endif %}
+		{% endif %}
+	    {% for task in tasks %}
+			<div class="task">
+				<div class="row">
+					<div class="large-8 columns">
+						<h4 class="task__title"><a href="{{ url_for('frontend.task', id=task.id) }}">{{ task.title }}</a></h4>
+						<span class="task__reward">{{ '%d руб.' % task.reward if task.reward else 'Цена договорная' }}</span>
+						<div class="task__due">
+							{% if (task.due > now) %}
+							Осталось <span class="task__due-time">{{ (task.due - now) | time_delta_text }}</span>
+							{% endif %}
+						</div>
+					</div>
+					
+					<div class="right-align large-4 columns">
+						<div class="task__customer-avatar-wrapper">
+							<img class="task__customer-avatar" {#TODO#} src="/static/assets/img/no_avatar.png">
+						</div>
+						<a href="{{ url_for('frontend.user_view', id=task.customer.id) }}"><span class="task__customer">{{ task.customer.full_name }}</span></a><br>
+						<span class="task__customer-rating">{{ 'Рейтинг: %d' % task.customer.rating  if task.customer.rating else 'Нет оценок'}}</span>
+
+					</div>
+				</div>
+				<div class="row">
+					<div class="large-8 columns">
+						{% set addresses = task.addresses %}
+						{% if addresses|length == 0 %}
+						{% elif addresses|length == 1 %}
+							<p>Адрес:  <b>{{ addresses[0] }}</b></p>
+						{% else %}
+							<p>Адреса:  <b>{{ addresses|join('; ') }}</b></p>
+						{% endif %}
+						
+					</div>
+					<div class="large-4 columns">
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+		</section>
+
+	</div>
+
+{% endblock body %}

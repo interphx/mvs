@@ -1,0 +1,41 @@
+{
+	"app": {
+		"debug": true,
+		"template_dir": "templates",
+		"static_dir": "static",
+		"database_uri": "sqlite:///test.db"
+	},
+	
+	"website": {
+		"name": "Movesol",
+		"mail_address": "movesol@yandex.ru",
+		"mail_name": "Movesol"
+	},
+	
+	"accounts": {
+		"salt_length": 8,
+		"hashing_algorithm": "sha1",
+		"generated_password_length": 9,
+		"hashing_pattern": "{password}{salt}"
+	},
+	
+	"flask": {
+		"DEBUG": true,
+		"MAX_CONTENT_LENGTH": 10485760,
+		"WTF_CSRF_ENABLED": false,
+		"WTF_CSRF_TIME_LIMIT": 10000,
+		"CSRF_SESSION_KEY": "jmrr9versb2hgd8ny25lrz2vdzx3jxmv",
+		"SECRET_KEY": "jmrr9versb2hgd8ny25lrz2vdzx3jxmv",
+		"HOST": null,
+		"PORT": 5000,
+		"SERVER_NAME": "movesol.ru",
+		"SMS_KEY": "1633d522-ec12-8eb4-b913-739e71e839ad",
+		"SMS_SENDER": "Movesol",
+		"MAIL_SERVER": "smtp.yandex.ru",
+		"MAIL_PORT": 465,
+		"MAIL_USE_SSL": true,
+		"MAIL_USE_TLS": false,
+		"MAIL_USERNAME": "movesol@yandex.ru",
+		"MAIL_PASSWORD": "icorunow0"
+	}
+}

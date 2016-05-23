@@ -1,0 +1,133 @@
+<!doctype html>
+<html class="no-js" lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="{%block seo_keywords %}{{ settings.seo_keywords }}{% endblock %}" />
+    <meta name="description" content="{%block seo_description %}{{ settings.seo_description }}{% endblock %}" />
+	{% block meta %}
+	{% endblock %}
+    <title>{% block title %}{{ config.website.name }}{% endblock %}</title>
+    {% block styles %}
+    <link rel="stylesheet" href="/static/assets/css/app.css">
+    <link rel="stylesheet" href="/static/assets/css/additional_styles.css">
+    <link rel="stylesheet" href="/static/assets/css/jquery.datetimepicker.css">
+    <link rel="stylesheet" href="/static/assets/css/magnific-popup.css">
+    <link rel="stylesheet" href="/static/assets/css/chosen.min.css">
+    <link rel="stylesheet" href="/static/assets/css/trumbowyg/trumbowyg.min.css">
+    {% endblock %}
+    <script src="/static/assets/js/modernizr/modernizr.js"></script>
+    <script>
+        GLOBAL = {
+            config: {
+            },
+
+            current_user: {
+                id: {{current_user.id or 'null'}},
+                full_name: '{{current_user.full_name|oneline if current_user.full_name else "null"}}',
+                doer: !!{{(current_user.doer or 'false')|lower}},
+                is_authenticated: !!{{current_user.is_authenticated()|lower}},
+                about: '{{ current_user.about|nl2br if current_user.about else "" }}',
+                balance: {{ '0' if not current_user.balance else current_user.balance }}
+            }
+        };
+    </script>
+	{% block js_globals %}
+	{% endblock %}
+</head>
+
+<body class="{% block controller %}{% endblock %}">
+    <div class="off-canvas-wrap" data-offcanvas>
+        <div class="inner-wrap">
+            {% block menu %}
+            <div class="row full-width sticky-header hide-for-small-only">
+                <div class="small-2 columns hide-for-medium-only sticky-header__logo">
+                    <div class="center-y">
+                        <a href="{{ url_for('frontend.index') }}" class="sticky-header__link"><img class="sticky-header__logo" src="/static/assets/img/logo_shaded.png"></a>
+                    </div>
+                </div>
+                <nav class="small-7 columns sticky-header__items">
+                    <div class="center-y">
+                        <a href="{{ url_for('frontend.task_list') }}" class="sticky-header__nav-link">Задания</a>
+                        <a href="{{ url_for('frontend.user_list') }}" class="sticky-header__nav-link">Исполнители</a>
+                        <a href="{{ url_for('frontend.info') }}" class="sticky-header__nav-link last">Как это работает</a>
+						{% if current_user.is_authenticated() %}
+                        <a href="{{ url_for('frontend.task_new') }}" class="sticky-header__nav-link">Создать задание</a>
+                        {% if current_user.rights == 'admin' %}
+                        <a href="{{ url_for('frontend.admin_settings') }}" class="sticky-header__nav-link last">Админка</a>
+                        {% endif %}
+                        <a href="{{ url_for('frontend.logout') }}" class="sticky-header__nav-link">Выйти</a>
+						{% endif %}
+                    </div>
+                </nav>
+                <div class="small-2 columns sticky-header__profile">
+                    <div class="center-y">
+                        {% if current_user.is_authenticated() %}
+                        <a href="{{ url_for('frontend.user_view', id = current_user.id) }}">{{ current_user.full_name }}</a>
+                        {% else %}
+                            <a href="{{ url_for('frontend.login') }}" class="sticky-header__nav-link">Вход</a>
+                            <a href="{{ url_for('frontend.reg') }}" class="sticky-header__nav-link">Регистрация</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <nav class="tab-bar show-for-small-only">
+                <div class="left-small">
+                    <a role="button" aria-controls="side-menu" aria-expanded="false" class="left-off-canvas-toggle menu-icon"><span></span></a>
+                </div>
+                <section class="middle tab-bar-section">
+                    <h1>Movesol</h1></section>
+            </nav>
+            <nav id="side-menu" class="left-off-canvas-menu">
+                <ul class="off-canvas-list">
+                    <li><a href="{{ url_for('frontend.task_list') }}">Задания</a></li>
+                    <li><a href="{{ url_for('frontend.user_list') }}">Исполнители</a></li>
+                    <li><a href="{{ url_for('frontend.info') }}">Справка</a></li>
+                    {% if current_user.is_authenticated() %}
+                    <li><a href="{{ url_for('frontend.task_new') }}">Создать задание</a></li>
+                    <li><a href="{{ url_for('frontend.logout') }}">Выйти</a></li>
+                    <li><a href="{{ url_for('frontend.user_view', id = current_user.id) }}">Мой профиль</a></li>
+                    {% else %}
+                    <li>
+                        <label>Профиль</label>
+                    </li>
+                    <li><a href="{{ url_for('frontend.login') }}">Вход</a></li>
+                    <li><a href="{{ url_for('frontend.reg') }}">Регистрация</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endblock menu %}
+
+            <div class="content-pad">
+            {% block body %}
+            {% endblock %}
+            </div>
+
+            <a class="exit-off-canvas"></a>
+        </div>
+    </div>
+	{% block footer %}
+	<footer class="footer">
+		<div class="row full-width">
+			<div class="small-12 columns center-x">
+				ООО "Мувис" &#169; {{ now.strftime('%Y') }}
+			</div>
+		</div>
+	</footer>
+	{% endblock %}
+    {% block scripts %}
+    <script src="/static/assets/js/jquery/dist/jquery.min.js"></script>
+    <script src="/static/assets/js/jquery.datetimepicker.min.js"></script>
+    <script src="/static/assets/js/foundation/js/foundation.min.js"></script>
+    <script src="/static/assets/js/jquery.magnific-popup.js"></script>
+    <script src="/static/assets/js/chosen.jquery.min.js"></script>
+    <script src="/static/assets/js/trumbowyg/trumbowyg.min.js"></script>
+    <script src="/static/assets/js/trumbowyg/ru.min.js"></script>
+    <script src="/static/assets/js/trumbowyg/trumbowyg.upload.min.js"></script>
+    <script src="/static/assets/js/app.js"></script>
+    {% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block controller %}payment_new{% endblock %}
+{% block body %}
+	{{ super() }}
+	<div class="page-narrower">
+		<div class="center-x">
+		    <h2>Телефон подтверждён</h2>
+		</div>
+		<p>Ваш телефон успешно подтверждён!</p>
+		<p><a href="{{ url_for('frontend.user_view', id=current_user.id) }}">Вернуться в профиль</a></p>
+		{% if not current_user.doer %}
+		<p><a href="{{ url_for('frontend.request_doer_rights') }}">Стать исполнителем</a></p>
+		{% endif %}
+		<p><a href="{{ url_for('frontend.index') }}">На главную страницу</a></p>
+	</div>
+{% endblock body %}

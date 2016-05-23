@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block controller %}add_portfolio_item{% endblock %}
+{% block body %}
+	{{ super() }}
+	<div class="page-narrower">
+		<div class="center-x">
+		    <h2>Добавление фото в портфолио</h2>
+		</div>
+
+        <p>Добавьте фотографию. Вы можете добавить небольшое описание, но это необязательно. Затем нажмите "Сохранить".</p>
+
+        <ul class="form-errors">
+          {% for field_name in form.errors %}
+            {% for error in form.errors[field_name] %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="row">
+                <label>Выберите фотографию:</label>
+                <input type="file" name="photo">
+            </div>
+			<div class="row">
+                <label>Описание (необязательно):</label>
+                <textarea name="description"></textarea>
+            </div>
+            <input type="submit" class="button" value="Добавить" >
+        </form>
+		<p><a href="{{ url_for('frontend.user_view', id=current_user.id) }}">Отменить и вернуться в профиль</a></p>
+	</div>
+{% endblock body %}

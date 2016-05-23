@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block body %}
+{{ super() }}
+<div class="page-narrower row">
+    <section class="admin-sidebar sidebar panel large-4 columns">
+        <ul class="admin__menu">
+            <li class="admin-menu__item"><a href="{{ url_for('frontend.admin_settings') }}">Настройки сайта</a></li>
+            <li class="admin-menu__item"><a href="{{ url_for('frontend.admin_info') }}">Страницы информации</a></li>
+            <li class="admin-menu__item"><a href="{{ url_for('frontend.admin_applications') }}">Заявки исполнителей</a></li>
+            <li class="admin-menu__item"><a href="{{ url_for('frontend.admin_edit_letters') }}">Редактирование писем</a></li>
+            <li class="admin-menu__item"><a href="{{ url_for('frontend.admin_users') }}">Пользователи</a></li>
+            {# TODO #}
+            {#
+            <li class="admin-menu__item"><a href="{{ url_for('frontend.admin_categories') }}">Категории</a></li>#}
+        </ul>
+    </section>
+    <div class="admin-page-content large-8 columns">
+    {% block admin_page %}
+    {% endblock %}
+    </div>
+</div>
+{% endblock body %}

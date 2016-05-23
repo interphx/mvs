@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block controller %}info_edit{% endblock %}
+{% block body %}
+	{{ super() }}
+	<div class="edit-info-page page-narrower">
+		<a href="{{ url_for('frontend.admin_edit_letters') }}">Назад к списку писем</a>
+		<h1>Редактирование письма</h1>
+		<form class="letter-form" method="POST">
+			<ul class="form-errors settings-form__errors">
+			  {% for field_name in letterForm.errors %}
+				{% for error in letterForm.errors[field_name] %}
+				  <li>{{ error }}</li>
+				{% endfor %}
+			  {% endfor %}
+			</ul>
+
+
+			<div class="row callout panel">
+				<label for="text">Текст</label>
+                <textarea class="edit-letter__text" name="text" id="text">{{ letter.text }}</textarea>
+			</div>
+
+			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+			<input type="submit" class="button" name="submit" value="Применить изменения" />
+		</form>
+	</div>
+
+{% endblock body %}

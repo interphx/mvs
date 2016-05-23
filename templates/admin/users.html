@@ -1,0 +1,19 @@
+{% extends 'admin/admin_base.html' %}
+{% block controller %}admin_users{% endblock %}
+{% block admin_page %}
+	{{ super() }}
+	
+	<h1>Все пользователи</h1>
+	<table class="admin-all-users" style="width: 100%">
+	<tr><th>Имя</th><th>Уровень прав</th><th>Исполнитель?</th><th>Действия</th></tr>
+	{% for user in all_users %}
+		<tr>
+			<td><a href="{{ url_for('frontend.user_view', id=user.id) }}">{{ user.full_name }}</a></td>
+			<td>{{ user.rights|rights_level_russian }}</td>
+			<td>{{ 'Да' if user.doer else 'Нет' }}</td>
+			<td><button class="btn btn-small js-admin-delete-user">Удалить</button></td>
+		</tr>
+	{% endfor %}
+	</table>
+
+{% endblock admin_page %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block controller %}task_new{% endblock %}
+{% block body %}
+	{{ super() }}
+	<div class="center-x">
+		<h2>Заказ услуги</h2>
+	</div>
+	<form class="task-form row">
+		<div class="row">
+		   <div class="row">
+				<label>
+					Выберите категорию:
+					<select name="category_id">
+						{% for category in categories %}
+							<optgroup label="{{ category.name }}">
+								{% for subcategory in category.children %}
+									<option value="{{ subcategory.id }}">{{ subcategory.name }}</option>
+								{% endfor %}
+							</optgroup>
+						{% endfor %}
+					</select>
+				</label>
+			</div>
+
+			<div class="row">
+				<label>Что нужно сделать? Кратко опишите задачу<input type="text" name="title" placeholder="Нужно перевезти мебель" /></label>
+			</div>
+
+			<div class="row">
+				<label>Подробности<textarea type="text" name="description" placeholder="Например: доставить шкаф из IKEA на Юмашева 1, 13-14 июля"></textarea></label>
+			</div>
+
+			<div class="row">
+				<label>Нужно сделать до<input type="text" name="due" class="datetime"></label>
+			</div>
+
+			<div class="row">
+				<label>Адреса</label>
+				<div class="task-form__addresses">
+					<div class="task-form__address row">
+						<div class="large-8 columns">
+							<input type="text" name="addresses[]" class="address" placeholder="8 марта, 43, Цирк">
+						</div>
+						<div class="large-4 columns">
+							<a href="#" class="task-form__remove-address-link">(Убрать адрес)</a>
+						</div>
+					</div>
+				</div>
+				<a href="#" class="task-form__add-address-link">(Добавить ещё адрес)</a>
+			</div>
+
+			<div class="row">
+				<label>Сколько вы готовы заплатить за работу?</label>
+				<div class="callout panel">
+					<div class="row radio">
+						<input type="radio" name="is-price-open" value="1" id="price-open" checked>
+						<label for="price-open">Пусть исполнитель предложит цену</label>
+					</div>
+					<div class="row radio">
+						<input type="radio" name="is-price-open" value="0" id="price-fixed">
+						<label for="price-fixed">Могу заплатить за работу</label>
+						<input type="tel" class="task-form__reward" name="reward" id="reward"> <span>руб.</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<label>Ваш телефон<input type="tel" name="phone" value="{{ current_user.phone if current_user.is_authenticated() and current_user.phone }}"></label>
+			</div>
+
+			<div class="row">
+				<div class="center-x">
+					<input class="task-form__submit large button radius" type="submit"value="Создать задание">
+				</div>
+			</div>
+
+		</div>
+
+
+	</form>
+{% endblock body %}

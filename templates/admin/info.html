@@ -1,0 +1,24 @@
+{% extends 'admin/admin_base.html' %}
+{% block controller %}admin_info{% endblock %}
+{% block admin_page %}
+	{{ super() }}
+    <h1>Информационные страницы</h1>
+
+    <div class="admin-info__items">
+        {% for page in pages %}
+            <div class="page-item row">
+                <div class="page-item__title small-7 columns">
+                    <a href="{{  url_for('frontend.info_page', url_name=page.url_name)  }}">{{ page.title }}</a>
+                </div>
+                <div class="page-item__actions small-5 columns">
+                    <a class="button tiny" data-id="{{ page.id }}" data-action="delete">Удалить</a>
+                    <a class="button tiny" data-id="{{ page.id }}" data-action="update" href="{{ url_for('frontend.edit_info_page', id=page.id) }}">Изменить</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <a class="button" href="{{ url_for('frontend.new_info_page') }}">Создать страницу</a>
+        
+
+{% endblock admin_page %}

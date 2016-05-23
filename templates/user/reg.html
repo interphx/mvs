@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="reg-page page-narrower">
+	<div class="center-x">
+		<h2>Регистрация</h2>
+	</div>
+	<div class="row">
+		<div class="large-6 columns">
+			{#<p>Регистрация на {{ config.website.name }} позволит быстро находить людей, которые выполнят для вас работу. Вы также сможете сами стать исполнителем и зарабатывать!</p>#}
+			<p class="soft-hint">Просто войдите через социальные сети</p>
+			<script>
+				function preview(token){
+				    $.getJSON("//ulogin.ru/token.php?host=" +
+				        encodeURIComponent(location.toString()) + "&token=" + token + "&callback=?",
+				    function(data){
+				        data=$.parseJSON(data.toString());
+				        if(!data.error){
+				            alert("Привет, "+data.first_name+" "+data.last_name+"!");
+				        } else {
+				        	console.log('Error: ', data);
+				        }
+				    });
+				}
+			</script>
+			<script src="//ulogin.ru/js/ulogin.js"></script>
+			<div id="uLogin" data-ulogin="display=panel;fields=first_name,last_name,email,city,phone;providers=vkontakte,twitter,mailru,facebook;hidden=;callback=preview;redirect_uri=http%3A%2F%2Fmovesol.ru%2Fsocial_login"></div>
+			<script type="text/javascript">
+				uLogin.setStateListener("uLogin", "open", function(){
+				    console.log("uLogin: open: ", arguments);
+				});
+
+				uLogin.setStateListener("uLogin", "close", function(){
+				    console.log("uLogin: close: ", arguments);
+				});	
+
+				uLogin.setStateListener("uLogin", "ready", function(){
+				    console.log("uLogin: ready: ", arguments);
+				});	
+
+				uLogin.setStateListener("uLogin", "receive", function(){
+				    console.log("uLogin: receive: ", arguments);
+				});
+			</script>
+			{#<p>(Здесь будут размещаться кнопки регистрации через социальные сети)</p>#}
+		</div>
+		<div class="large-6 columns">
+			<p class="soft-hint">Или зарегистрируйтесь по e-mail</p>
+			<article class="reg-form page-narrower">
+			<ul class="form-errors reg-form__errors">
+			  {% for field_name in reg_form.errors %}
+				{% for error in reg_form.errors[field_name] %}
+				  <li>{{ error }}</li>
+				{% endfor %}
+			  {% endfor %}
+			</ul>
+			<form method="POST">
+			  <div class="row">
+				<div class="large-12 columns">
+				  <label>Полное имя
+					<!-- <input type="text" name="fullname" placeholder="large-12.columns" /> -->
+					{{ reg_form.fullname() }}
+				  </label>
+				</div>
+			  </div>
+
+			  <div class="row">
+				<div class="large-12 columns">
+				  <label>E-mail
+					<!-- <input type="text" name="email" placeholder="large-12.columns" /> -->
+					{{ reg_form.email() }}
+				  </label>
+				</div>
+			  </div>
+			  
+			  <div class="row">
+				<div class="large-12 columns">
+				  <label>Телефон (через +7)
+					<!-- <input type="text" name="phone" placeholder="large-12.columns" /> -->
+					{{ reg_form.phone() }}
+				  </label>
+				</div>
+			  </div>
+
+			  <div class="row">
+				<div class="large-12 columns">
+				  <label>Город
+					<!-- <input type="text" name="city" placeholder="large-12.columns" /> -->
+					{{ reg_form.city() }}
+				  </label>
+				</div>
+			  </div>
+			  
+			  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+			  <input type="submit" class="button" value="Зарегистрироваться" />
+			</form>
+			</article>
+		</div>
+	</div>
+</div>
+{% endblock %}

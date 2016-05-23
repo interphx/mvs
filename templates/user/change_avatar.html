@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block controller %}payment_new{% endblock %}
+{% block body %}
+	{{ super() }}
+	<div class="page-narrower">
+		<div class="center-x">
+		    <h2>Добавление фото</h2>
+		</div>
+
+        <p>Добавьте своё фото и нажмите "Сохранить"</p>
+
+        <ul class="form-errors">
+          {% for field_name in avatarForm.errors %}
+            {% for error in avatarForm.errors[field_name] %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="row">
+                <label>Выберите фото:</label>
+                <input type="file" name="avatar">
+            </div>
+            <input type="submit" class="button" value="Сохранить" >
+        </form>
+		<p><a href="{{ url_for('frontend.user_view', id=current_user.id) }}">Вернуться в профиль</a></p>
+	</div>
+{% endblock body %}
