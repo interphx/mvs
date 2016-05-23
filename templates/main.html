@@ -42,7 +42,11 @@
             </div>
         </div>		
     </div>
-	
+
+<div class="info-block panel callout">
+    {% include 'infoblocks/main_page_upper.html' %}
+</div>
+
 <div class="panel">
 	<h3 class="panel__heading">Популярные услуги</h3>
 	
@@ -88,6 +92,10 @@
 			<a href="{{ url_for('frontend.user_list') }}" class="large radius button">Все услуги</a>
 		</div>
 	</div>
+</div>
+
+<div class="info-block panel callout">
+    {% include 'infoblocks/main_page_lower.html' %}
 </div>
 
 {% endblock body %}

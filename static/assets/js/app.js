@@ -44,6 +44,14 @@ Movesol = {
 				resetCss: true,
                 btnsAdd: ['upload']
 			});
+            /*tinymce.init({
+                selector: '.wysiwyg',
+                plugins: 'image media',
+                menubar: false,
+                language: 'ru',
+                image_upload_url: 'api/v1/wysiwyg_uploads/',
+                automatic_uploads: true
+            });*/
 		}
 	},
     

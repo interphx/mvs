@@ -23,7 +23,7 @@ class WysiwygUploadAPI(Resource):
         args = parser.parse_args()
         file = upload_file(args['fileToUpload'], description='Изображение для страницы сайта', role='other', author_id=None)
         
-        return {'file': file.url, 'success': True}
+        return {'file': file.url, 'location': file.url, 'success': True}
 
 class UploadListAPI(Resource):
 

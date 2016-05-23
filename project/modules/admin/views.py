@@ -165,6 +165,51 @@ def admin_edit_letter(name):
         'letter': letter
     })
 
+def infoblock_human_name(name):
+    return {
+        'main_page_upper': 'Главная страница (верхний блок информации)',
+        'main_page_lower': 'Главная страница (нижний блок информации)'
+    }.get(name, name)
+
+@frontend.route('admin/edit_infoblocks/', methods=['GET'])
+@rights_required('admin')
+def admin_edit_infoblocks():
+    filenames = glob.glob('templates/infoblocks/*.html')
+    infoblocks = []
+    for filename in filenames:
+        plain_name = os.path.splitext(os.path.basename(filename))[0]
+        if plain_name.startswith('base_'):
+            continue
+        infoblocks.append({
+            'name': plain_name,
+            'human_name': infoblock_human_name(plain_name)
+        })
+
+
+    return render_template('admin/edit_infoblocks.html', **{
+        'infoblocks': infoblocks
+    })
+
+@frontend.route('admin/edit_infoblock/<name>/', methods=['GET', 'POST'])
+@rights_required('admin')
+def admin_edit_infoblock(name):
+    infoblock = {'name': name, 'human_name': infoblock_human_name(name)}
+    with codecs.open('templates/infoblocks/' + name + '.html', 'r', 'utf-8') as infoblock_file:
+        infoblock['text'] = infoblock_file.read()
+
+    form = LetterForm()
+
+    if form.validate_on_submit():
+        with codecs.open('templates/infoblocks/' + name + '.html', 'w', 'utf-8') as infoblock_file:
+            infoblock_file.write(form.text.data)
+        with codecs.open('templates/infoblocks/' + name + '.html', 'r', 'utf-8') as infoblock_file:
+            infoblock['text'] = infoblock_file.read()
+
+    return render_template('admin/edit_infoblock.html', **{
+        'infoblockForm': form,
+        'infoblock': infoblock
+    })
+
 @frontend.route('admin/info/', methods=['GET'])
 @rights_required('admin')
 def admin_info():

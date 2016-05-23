@@ -1,0 +1,21 @@
+{% extends 'admin/admin_base.html' %}
+{% block controller %}admin_edit_infoblocks{% endblock %}
+{% block admin_page %}
+	{{ super() }}
+    <h1>Редактирование блоков информации</h1>
+
+    <div class="admin-info__items">
+        {% for infoblock in infoblocks %}
+            <div class="infoblock-item row">
+                <div class="infoblock-item__title small-7 columns">
+                    <a href="{{  url_for('frontend.admin_edit_infoblock', name=infoblock.name)  }}">{{ infoblock.human_name or infoblock.name }}</a>
+                </div>
+                <div class="infoblock-item__actions small-5 columns">
+                    <a class="button mini" href="{{ url_for('frontend.admin_edit_infoblock', name=infoblock.name) }}">Изменить</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+        
+
+{% endblock admin_page %}
