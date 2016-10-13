@@ -44,16 +44,21 @@ def get_redirect_url(form, fallback=0):
         return url_for('frontend.index')
 
     return fallback
+    
+rights_order = ['guest', 'deleted', 'user', 'trusted', 'moderator', 'admin']
+def has_rights(user, rights):
+    rights_level = user.rights or 'guest'
+    if rights_level not in rights_order or rights not in rights_order:
+        return False
+    if rights_order.index(rights_level) < rights_order.index(rights):
+        return False
+    return True
 
 def rights_required(rights):
-    rights_order = ['guest', 'deleted', 'user', 'moderator', 'admin']
     def decorator(f):
         @functools.wraps(f)
         def wrapper(*args, **kwargs):
-            rights_level = current_user.rights or 'guest'
-            if rights_level not in rights_order:
-                return redirect( url_for('frontend.access_denied') )
-            if rights_order.index(rights_level) < rights_order.index(rights):
+            if not has_rights(current_user, rights):
                 return redirect( url_for('frontend.access_denied') )
             return f(*args, **kwargs)
         return wrapper

@@ -121,7 +121,7 @@ class TaskOfferListAPI(Resource):
             abort(403, message='No task with id ' + str(args['task_id']))
 
         if task.reward == None and args['price'] == None:
-            abort(400, 'You must specify a price if reward is not specified for task')
+            abort(400, message='You must specify a price if reward is not specified for task')
         
         # TODO: Более аккуратный подсчёт залога
 

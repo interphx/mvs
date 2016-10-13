@@ -33,7 +33,7 @@ MIME_TO_EXT = {
 class FileTypeNotAllowed(Exception): pass
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def upload_file(file, description='', role='other', author_id=None):
 	if not allowed_file(file.filename):
@@ -46,9 +46,11 @@ def upload_file(file, description='', role='other', author_id=None):
 	blob = file.read()
 	hash = md5(blob).hexdigest()
 
-	duplicate = Upload.query.filter_by(hash=hash).first()
-	if duplicate:
-		return duplicate
+    # TODO: This breaks uploading same files with different descriptions
+    # TODO: Separate upload data and metadata
+	#duplicate = Upload.query.filter_by(hash=hash).first()
+	#if duplicate:
+	#	return duplicate
 
 	unique_name = str(uuid.uuid4()).replace('-', '')
 	filename = unique_name + '.' + ext

@@ -11,7 +11,7 @@
 			<td><a href="{{ url_for('frontend.user_view', id=user.id) }}">{{ user.full_name }}</a></td>
 			<td>{{ user.rights|rights_level_russian }}</td>
 			<td>{{ 'Да' if user.doer else 'Нет' }}</td>
-			<td><button class="btn btn-small js-admin-delete-user">Удалить</button></td>
+			<td><button class="btn btn-small js-admin-delete-user" data-user-id="{{ user.id }}">Удалить</button></td>
 		</tr>
 	{% endfor %}
 	</table>

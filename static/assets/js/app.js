@@ -22,6 +22,52 @@ UTIL = {
 
 // Site-specific
 
+function appendTrailingSlash(url) {
+    var paramsStartPos = url.indexOf('?');
+    var urlPathEndPos = (paramsStartPos !== -1 ? paramsStartPos : void 0) || url.length;
+    if (url.charAt(urlPathEndPos - 1) !== '/') {
+        url = url.substr(0, urlPathEndPos) + '/' + url.substr(urlPathEndPos);
+    }
+    return url;
+}
+
+function request(verb, address, data, onsuccess, onerror) {
+    var url = '/api/v1/' + (address.charAt(0) === '/' ? address.substr(1) : address);
+    url = appendTrailingSlash(url);
+    $.ajax({
+        method: verb.toUpperCase(),
+        url: url,
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        error: function(xhr, textStatus, errorThrown) {
+            onerror.call(this, xhr, textStatus, errorThrown);
+            console.log('ERROR: \n' + textStatus + '\n' + errorThrown + '\n' + xhr.responseText);
+        },
+        success: function(response) {
+            onsuccess.call(response);
+        }
+    });
+}
+function logError() {
+    console.log.apply(console, arguments);
+}
+function refreshPage() {
+    window.location.reload(false);
+}
+
+function promptUntil(msg, pred) {
+  var result;
+  do {
+    result = prompt(msg);
+  } while (!pred(result));
+  return result;
+}
+
+request.post = request.bind(null, 'post');
+request.get = request.bind(null, 'get');
+request.put = request.bind(null, 'put');
+request.delete = request.bind(null, 'delete');
+
 Helpers = {
 	getTaskCommission: function(task_price) {
 		return Math.floor(task_price * GLOBAL.config.payments.commission_coeff);
@@ -31,13 +77,16 @@ Helpers = {
 Movesol = {
 	common: {
 		init: function() {
+            // Initialize Foundation
 			$(document).foundation();
+            // Initialize all dateTimePickers on the page
 			$.datetimepicker.setLocale('ru');
 			$('.datetime').datetimepicker({
 				format: 'd.m.Y H:i',
 				minDate: '0',
                 dayOfWeekStart: 1
 			});
+            // Initialize WYSIWYG-editor
 			$('.wysiwyg').trumbowyg({
 				lang: 'ru',
 				autogrow: false,
@@ -73,6 +122,36 @@ Movesol = {
                 });
             });
             
+        }
+    },
+    
+    admin_users: {
+        init: function() {
+            $('.js-admin-delete-user').on('click', function(ev) {
+                var userId = parseInt($(ev.target).attr('data-user-id'));
+                if (!userId) {
+                    console.log('Invalid user id for deletion: ', userId, $(ev.target).attr('data-user-id'));
+                    return;
+                }
+                request('delete', '/users/' + userId, null, function() {
+                    var $form = $(
+                        '<div class="popup">' + 
+                        '<h3>Пользователь удалён</h3>' + 
+                
+                        '<a class="button js-button-ok">Ок</a>' + 
+                        '</div>'
+                    );
+                    
+                    $form.find('.js-button-ok').on('click', function() {
+                        $.magnificPopup.close();
+                        refreshPage();
+                    });
+
+
+                    $.magnificPopup.open({items: {src: $form}});
+                    
+                }, logError);
+            });
         }
     },
     
@@ -492,6 +571,33 @@ Movesol = {
 		init: function() {
             $('.js-mfp').magnificPopup({type:'image'});
             
+            // Принять персональное предложение
+            $('.js-accept-personal-offer').on('click', function(ev) {
+                var offerId = $(ev.target).attr('data-offer-id');
+                var requiresPrice = ($(ev.target).attr('data-requires-price') || '').toLowerCase() === 'true';
+                var data = {
+                    'offer_id': parseInt(offerId)
+                };
+                if (requiresPrice) {
+                    data['price'] = parseInt(promptUntil('Введите вашу цену (в рублях): ', function(x) {
+                        return !isNaN(x) || (x === '') || (typeof x === 'undefined');
+                    }));
+                    if (!data['price']) {
+                        return;
+                    }
+                }
+                request('post', 'task_personal_offer_confirmations/', data, function() {
+                    refreshPage();
+                }, logError);
+            });
+            // Отклонить персональное предложение
+            $('.js-decline-personal-offer').on('click', function(ev) {
+                var offerId = $(ev.target).attr('data-offer-id');
+                request('delete', 'task_personal_offers/' + offerId, null, function() {
+                    refreshPage();
+                }, logError);
+            });
+            
 			$('.js-action-edit-task-cats').on('click', function() {
 				var $this = $(this);
 				var cats_html = '';
@@ -751,6 +857,97 @@ Movesol = {
 
 				$.magnificPopup.open({items: {src: $form}});
 			});
+            
+            $('.js-action-delete-account').click(function() {
+				var $form = $(
+					'<div class="popup">' + 
+					'<h2>Удаление аккаунта</h2>' + 
+					'<ul class="errors-list"></ul>' + 
+                    '<p>Вы действительно хотите удалить аккаунт пользователя ' + GLOBAL.user.full_name + '?</p>' +
+					'<a class="button js-button-apply">Да, удалить аккаунт</a>' + 
+					'<a class="button js-button-cancel">Отмена</a>' +
+					'</div>'
+				);
+                
+				$form.find('.js-button-cancel').on('click', function() {
+					$.magnificPopup.close();
+				});
+                
+                $form.find('.js-button-apply').on('click', function() {
+                    request('delete', 'users/' + GLOBAL.user.id + '/', {});
+                });
+                
+                $.magnificPopup.open({items: {src: $form}});
+            });
+            
+            $('.js-offer-personal-task').click(function(){
+				var $form = $(
+					'<div class="popup">' + 
+					'<h2>Предложить задание</h2>' + 
+                    '<p class="js-if-has-tasks">Выберите одно из своих заданий:</p>' +
+                    '<div class="u-loading">Загрузка...</div>' +
+					'<ul class="errors-list"></ul>' + 
+					'<ul class="personal-offer__tasks-list js-if-has-tasks"></ul>' + 
+                    '<p class="js-if-has-tasks">или <a href="/task/new/">создайте новое задание</a>, а потом предложите его.</p>' +
+                    '<p class="js-if-has-tasks">Добавьте комментарий к своему предложению (необязательно)</p>' +
+                    '<textarea class="js-comment js-if-has-tasks"></textarea>' +
+                    '<p class="js-if-not-has-tasks"></p>' + 
+					'<a class="button js-button-apply js-if-has-tasks">Предложить</a>' + 
+					'<a class="button js-button-cancel">Отмена</a>' + 
+					'</div>'
+				);
+                
+				$form.find('.js-button-cancel').on('click', function() {
+					$.magnificPopup.close();
+				});
+
+				$form.find('.js-button-apply').on('click', function() {
+					var data = {};
+					var data = {
+                        task_id: $form.find('[type=radio]:checked').val(),
+                        receiver_id: GLOBAL.user.id,
+                        text: $form.find('.js-comment').val()
+                    };
+                    $.ajax({
+                        method: 'POST',
+                        url: '/api/v1/task_personal_offers/',
+                        contentType: 'application/json',
+                        data: JSON.stringify(data),
+                        success: function() {
+                            $.magnificPopup.close();
+                            $.magnificPopup.open({items: {src: $('<div class="popup"><p>Ваше предложение отправлено!</p></div>')}});
+                        }
+                    });
+                });
+                
+                $.ajax({
+                    method: 'GET',
+                    url: '/api/v1/users/' + GLOBAL.current_user.id + '/tasks/',
+                    contentType: 'application/json',
+                    success: function(resp) {
+                        $form.find('.u-loading').remove();
+                        var $tasks = $form.find('.personal-offer__tasks-list');
+                        $tasks.empty();
+                        if (resp.tasks.length === 0) {
+                            $form.find('.js-if-has-tasks').remove();
+                            $form.find('.js-if-not-has-tasks').html('<a href="/task/new/">Создайте задание</a>, чтобы предложить его.');
+                        }
+                        for (var i = 0; i < resp.tasks.length; ++i) {
+                            $tasks.append(
+                                '<li class="personal-offer__task-item">' + 
+                                '<label>' + '<input type="radio" value="' + resp.tasks[i].id + '" name="personal-offer-task">' + resp.tasks[i].title + '</label>' + 
+                                '</li>'
+                            );
+                            $tasks.find('input[type=radio]').first().attr('checked', true);
+                        }
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        $form.find('.errors-list').html(textStatus);
+                    }
+                });
+                
+                $.magnificPopup.open({items: {src: $form}});
+            });
 		},
 	},
 

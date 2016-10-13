@@ -234,7 +234,8 @@ def confirm_mobile():
 @frontend.route('request_doer_rights/', methods=['GET', 'POST'])
 @rights_required('user')
 def request_doer_rights():
-    if current_user.doer:
+    # Если пользователь уже проверенный, отправляем в профиль
+    if current_user.rights == 'trusted':
         return redirect(url_for('frontend.user_view', id=current_user.id))
 
     form = DoerApplicationForm()

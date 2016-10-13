@@ -52,6 +52,7 @@ class UserAPI(Resource):
         if  (not current_user.is_authenticated or not current_user.id == id) and current_user.rights != 'admin':
             abort(403, message='У вас нет прав для совершения этого действия')
         user.delete()
+        return {}, 200
         
 
     def put(self, id):

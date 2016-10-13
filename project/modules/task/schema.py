@@ -26,3 +26,12 @@ class TaskSchema(ma.Schema):
     category = ma.Nested(CategorySchema)
     #customer = ma.Nested(TaskStatusEnumSchema, exclude=('created_tasks',))
     #customer = db.Nested()
+
+class TaskListSchema(ma.Schema):
+    class Meta:
+        json_module = json
+        strict = True
+        fields = (
+            'tasks',
+        )
+    tasks = ma.Nested(TaskSchema, only=('id', 'title', 'status'), many=True)

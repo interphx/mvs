@@ -1,3 +1,4 @@
+import datetime
 import dateutil.parser
 from flask import url_for, redirect
 from flask.ext.login import login_required, current_user
@@ -9,7 +10,9 @@ from project.database import db
 
 from project.util import api_login_required
 
-from .schema import TaskSchema
+from project.modules.user.model import User
+
+from .schema import TaskSchema, TaskListSchema
 
 from .model import Task
 
@@ -69,7 +72,7 @@ class TaskAPI(Resource):
         parser.add_argument('title', required=True, location=locs)
         parser.add_argument('category_id', required=False, location=locs, type=int)
         parser.add_argument('description', required=False, location=locs)
-        parser.add_argument('due', required=False, location=locs, type=lambda x: dateutil.parser.parse(x))
+        parser.add_argument('due', required=False, location=locs, type=lambda x: dateutil.parser.parse(x, dayfirst=True))
         parser.add_argument('addresses', required=False, location=locs, action='append')
         parser.add_argument('reward', required=False, location=locs, type=int, default=None)
         parser.add_argument('contacts', required=False, location=locs, type=dict, action='append')
@@ -96,7 +99,7 @@ class TaskListAPI(Resource):
         parser.add_argument('title', required=True, location=locs)
         parser.add_argument('category_id', required=True, location=locs, type=int)
         parser.add_argument('description', required=True, location=locs)
-        parser.add_argument('due', required=True, location=locs, type=lambda x: dateutil.parser.parse(x))
+        parser.add_argument('due', required=True, location=locs, type=lambda x: dateutil.parser.parse(x, dayfirst=True))
         parser.add_argument('addresses', required=True, location=locs, action='append')
         parser.add_argument('reward', required=True, location=locs, type=int, default=None)
         parser.add_argument('contacts', required=True, location=locs, type=dict, action='append')
@@ -117,3 +120,9 @@ class TaskListAPI(Resource):
     def get(self):
        # TODO
        pass
+
+class UserTaskListAPI(Resource):
+    def get(self, user_id):
+        # TODO: Rename to clarify that this returns only unassigned tasks
+        tasks = User.query.get(user_id).created_tasks.filter_by(status='created').filter(Task.due >= datetime.datetime.now()).order_by(Task.created_at.desc())
+        return TaskListSchema().dump({'tasks': tasks}).data

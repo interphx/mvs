@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
 {% block controller %}user_deleted{% endblock %}
-{% set is_owner = current_user.is_authenticated() and current_user.id == user.id %}
-{% set is_admin = current_user.is_authenticated() and current_user.rights_level == 'admin' %}
 {% block body %}
 	{{ super() }}
 	<div class="page-narrower">

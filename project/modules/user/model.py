@@ -34,7 +34,7 @@ class User(Model, UserMixin):
     last_visited_at = Column(db.DateTime, default=None)
 
     phone = Column(db.String(100))
-    email = Column(db.String(100))
+    email = Column(db.String(100), unique=False)
     
     #created_tasks = relationship('Task', backref='customer', lazy='dynamic')
     #assigned_tasks = relationship('Task', backref='doer', lazy='dynamic')
@@ -47,15 +47,14 @@ class User(Model, UserMixin):
     active = Column(db.Boolean, default=True, nullable=False) # Is account activated
     email_confirmed = Column(db.Boolean, default=False, nullable=False) # Is account activated
     phone_confirmed = Column(db.Boolean, default=False, nullable=False) # Is phone confirmed
-    doer = Column(db.Boolean, default=False, nullable=False)   # Does a user have doer rights
+    doer = Column(db.Boolean, default=True, nullable=False)   # Does a user have doer rights
     
     task_categories = relationship('Category', secondary=category_to_doer, backref=db.backref('doers', lazy='dynamic'))
     
-    balance = Column(db.Numeric(precision=15, scale=2), default=None)
+    balance = Column(db.Numeric(precision=15, scale=2), default=0)
     
     avatar_id = Column(db.Integer, db.ForeignKey('upload.id'), nullable=True)
     avatar = relationship('Upload', foreign_keys=[avatar_id], uselist=False)
-    #phone_confirmed = 
 
     rights = Column(db.String(100), nullable=False, default='user')
 
@@ -75,6 +74,11 @@ class User(Model, UserMixin):
         self.phone = '000000000'
         self.email = 'deleted_email@deleted.deleted'
         self.rights = 'deleted'
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            raise
 
     @hybrid_property
     def rating(self):

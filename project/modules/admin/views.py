@@ -9,7 +9,7 @@ from flask import render_template, abort, request, redirect, url_for
 from project import config
 from project.database import db
 from project.frontend import frontend
-from project.util import rights_required, get_commission
+from project.util import rights_required, get_commission, has_rights
 from project.modules.user.helpers import notify_user
 from project.modules.constant import Constant, CommissionSettings
 from project.modules.info import InfoPage
@@ -229,9 +229,11 @@ def confirm_doer_application():
     user = application.user
     # TODO error checking
     try:
-        user.doer = True
-        if not user.balance:
-            user.balance = 0
+        #user.doer = True
+        #if not user.balance:
+        #    user.balance = 0
+        if not has_rights(user, 'trusted'):
+            user.rights = 'trusted'
         db.session.delete(application)
         db.session.commit()
     except:
@@ -240,7 +242,7 @@ def confirm_doer_application():
     
     notify_user(user, {
         'email': render_template('letters/got_doer_rights.html')
-    }, subject='Вы получили права исполнителя!')
+    }, subject='Вы стали проверенным пользователем!')
 
     return redirect(url_for('frontend.admin_applications'))
 

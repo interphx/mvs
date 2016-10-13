@@ -1,7 +1,7 @@
 import datetime
 import re
 from project import app, config
-from project.util import get_commission
+from project.util import get_commission, has_rights
 from project.modules.constant import Constant
 from jinja2 import Markup
 
@@ -93,5 +93,6 @@ def inject_globals():
 		'now': datetime.datetime.now(),
 		'settings': Constant.query.filter_by(active=True).first(),
 		'config': config,
-        'user_avatar_link': user_avatar_link
+        'user_avatar_link': user_avatar_link,
+        'has_rights': has_rights
 	}

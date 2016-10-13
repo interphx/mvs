@@ -4,8 +4,7 @@
 	},
 	
 	"flask": {
-		"SERVER_NAME": "localhost",
-		"HOST": "localhost",
-        "PORT": 80
+		"SERVER_NAME": "movesol.ru"
+
 	}
 }

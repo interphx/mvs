@@ -17,11 +17,27 @@
 			{% endfor %}
 		}
 	{% endif %}
+	GLOBAL.user = {
+		id: {{ user.id }},
+		full_name: "{{ user.full_name }}"
+	};
 </script>
 {% endblock %}
 {% block body %}
 	{{ super() }}
 	<div class="user-profile page-narrower">
+		{% if is_owner and user.received_personal_offers.count() > 0 %}
+		<div class="panel callout">
+			<h3>Вам предложили выполнить задания:</h3>
+			{% for offer in user.received_personal_offers %}
+				<div class="received-personal-offer">
+					<a href="{{ url_for('frontend.task', id=offer.task.id, _external=True) }}">{{ offer.task.title }}</a>
+					<a class="button small js-accept-personal-offer" data-offer-id="{{ offer.id }}" data-requires-price="{{ not offer.task.price }}">Принять</a>
+					<a class="button small js-decline-personal-offer" data-offer-id="{{ offer.id }}">Отклонить</a>
+				</div>
+			{% endfor %}
+		</div>
+		{% endif %}
 		<h1 class="user-profile__fullname">
 			{{ user.full_name }}
 			{% if is_owner %}
@@ -69,15 +85,16 @@
             {% endif %}
 			<div class="user-profile__action action"><a class="js-action-change-password">Сменить пароль</a></div>
 			{% if user.doer %}<div class="user-profile__action action"><a href="{{url_for('frontend.payment_new')}}">Пополнить баланс</a></div>{% endif %}
-			{% if not user.doer %}
-			<div class="user-profile__action action"><a href="{{ url_for('frontend.request_doer_rights') }}">Стать исполнителем</a></div>
+			{% if not has_rights(current_user, 'trusted') %}
+			<div class="user-profile__action action"><a href="{{ url_for('frontend.request_doer_rights') }}">Стать проверенным</a></div>
 			{% endif %}
 			{% if not current_user.phone_confirmed %}
 				<div class="user-profile__action action"><a href="{{url_for('frontend.confirm_mobile')}}">Подтвердить телефон</a></div>
 			{% endif %}
-			<div class="user-profile__action action--dangerous action"><a href="#">Удалить профиль</a></div>
+			<div class="user-profile__action action--dangerous action"><a class="js-action-delete-account">Удалить профиль</a></div>
 		</div>
 		{% endif %}
+		{% if not is_owner and user.doer %}<div class="user-profile__action action"><a class="js-offer-personal-task">Предложить задание</a></div>{% endif %}
 
 		<div class="row">
 			<h2>
