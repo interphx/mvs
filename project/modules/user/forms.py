@@ -1,11 +1,21 @@
 from wtforms import BooleanField, TextField, PasswordField, BooleanField, FileField, validators
+from wtforms.fields.html5 import EmailField
 from flask.ext.wtf import Form
+
+from project.util import normalize_mobile
 
 class RegistrationForm(Form):
     fullname = TextField('Полное имя', [validators.Length(min=1, max=100, message='Полное имя должно содержать не менее 1 и не более 100 букв.')])
-    email = TextField('E-mail', [validators.Length(min=4, max=100, message='E-mail не может быть короче 4 или длиннее 100 знаков.')])
-    phone = TextField('Телефон', [validators.Length(min=4, max=100, message='Номер телефона должен содержать не менее 4 и не более 100 знаков.')])
+    email = EmailField('E-mail', [validators.DataRequired(message='Пожалуйста, укажите коррекнтый e-mail.'), validators.Email(message='Пожалуйста, укажите коррекнтый e-mail.')])
+    phone = TextField('Телефон', [])
     city = TextField('Город', [validators.Length(min=1, max=100, message='Пожалуйста, укажите город.')])
+    
+    def validate_phone(form, field):
+        # +7 и ещё 10 цифр
+        PHONE_LENGTH = 12
+        phone = field.data
+        if not phone or len(normalize_mobile(phone)) != PHONE_LENGTH:
+            raise validators.ValidationError('Номер телефона должен содержать ровно 10 цифр, не считая +7.')
 
 class LoginForm(Form):
     email = TextField('E-mail', [validators.Length(min=4, max=100, message='E-mail не может быть короче 4 или длиннее 100 знаков.')])

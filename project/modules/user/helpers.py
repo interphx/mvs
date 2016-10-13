@@ -15,6 +15,7 @@ from .passgen import gen_password, gen_salt
 class EmailExistsException(Exception): pass
 class InvalidEmailException(Exception): pass
 class InvalidPasswordException(Exception): pass
+class InvalidPhoneException(Exception): pass
 
 # TODO: preferred_only
 def notify_user(user, notification_means, preferred_only=True, subject='Уведомление'):

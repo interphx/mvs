@@ -13,7 +13,7 @@ from project import db, config
 
 from .forms import *
 from .model import User, UloginData
-from .helpers import create_user, login_user, InvalidEmailException, InvalidPasswordException, EmailExistsException, login_user_object, set_user_password
+from .helpers import create_user, login_user, InvalidEmailException, InvalidPasswordException, EmailExistsException, InvalidPhoneException, login_user_object, set_user_password
 from .passgen import gen_password
 
 from project.modules.mobile_confirmation import MobileConfirmation
@@ -114,6 +114,9 @@ def user_view(id):
 
 @frontend.route('reg/', methods=('GET', 'POST'))
 def reg():
+    # +7 и ещё 10 цифр
+    PHONE_LENGTH = 12
+
     form = RegistrationForm()
 
     # TODO: Exception handling
