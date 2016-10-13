@@ -6,7 +6,7 @@ from project.util import normalize_mobile
 
 class RegistrationForm(Form):
     fullname = TextField('Полное имя', [validators.Length(min=1, max=100, message='Полное имя должно содержать не менее 1 и не более 100 букв.')])
-    email = EmailField('E-mail', [validators.DataRequired(message='Пожалуйста, укажите коррекнтый e-mail.'), validators.Email(message='Пожалуйста, укажите коррекнтый e-mail.')])
+    email = EmailField('E-mail', [validators.DataRequired(message='Пожалуйста, укажите коррекнтый e-mail.'), validators.Email(message='Пожалуйста, укажите корректный e-mail.')])
     phone = TextField('Телефон', [])
     city = TextField('Город', [validators.Length(min=1, max=100, message='Пожалуйста, укажите город.')])
     
